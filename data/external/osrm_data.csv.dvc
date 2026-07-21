@@ -1,0 +1,5 @@
+outs:
+- md5: 70dfab42185785c2e82f96db5860f2e1
+  size: 735528424
+  hash: md5
+  path: osrm_data.csv
