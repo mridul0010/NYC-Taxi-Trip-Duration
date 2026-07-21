@@ -52,3 +52,55 @@ stages:
       hash: md5
       md5: 468986747358e4fa927a6adbd231aa27
       size: 1801017
+  dataset_osrm:
+    cmd: python src/dataset_osrm.py
+    deps:
+    - path: data/external/osrm_data.csv
+      hash: md5
+      md5: 70dfab42185785c2e82f96db5860f2e1
+      size: 735528424
+    - path: data/raw/NYC.csv
+      hash: md5
+      md5: e59c291a4b1c640f1dab33b89daa22e1
+      size: 200589097
+    - path: src/dataset_osrm.py
+      hash: md5
+      md5: 3e1a51a399667326e8e88de38071650b
+      size: 8653
+    outs:
+    - path: data/processed/osrm_boosted/processed_osrm_NYC.csv
+      hash: md5
+      md5: 27ab23e92ae9844f3abc679f5cd3c4f7
+      size: 238368427
+  features_osrm:
+    cmd: python src/features_osrm.py
+    deps:
+    - path: data/processed/osrm_boosted/processed_osrm_NYC.csv
+      hash: md5
+      md5: 27ab23e92ae9844f3abc679f5cd3c4f7
+      size: 238368427
+    - path: src/features_osrm.py
+      hash: md5
+      md5: f854ba2da7af75305b8e2fd242ce4d83
+      size: 6989
+    params:
+      params.yaml:
+        features_osrm.random_state: 42
+        features_osrm.test_size: 0.2
+    outs:
+    - path: data/processed/osrm_boosted/features.csv
+      hash: md5
+      md5: 6f2e4ff723cc1686b56f196a064b37df
+      size: 553104863
+    - path: data/processed/osrm_boosted/features_test.csv
+      hash: md5
+      md5: 337acc5e18d9d1f8e839fbd9431e4843
+      size: 138280817
+    - path: data/processed/osrm_boosted/labels.csv
+      hash: md5
+      md5: 9ea9965c8b24a04e10eeb6dc81dcda96
+      size: 7206166
+    - path: data/processed/osrm_boosted/labels_test.csv
+      hash: md5
+      md5: 468986747358e4fa927a6adbd231aa27
+      size: 1801017
