@@ -44,3 +44,15 @@ stages:
       - data/processed/osrm_boosted/labels.csv
       - data/processed/osrm_boosted/features_test.csv
       - data/processed/osrm_boosted/labels_test.csv
+
+  Model_Training:
+    cmd : python src/modeling/train.py
+    deps :
+      - data/processed/osrm_boosted/features.csv
+      - data/processed/osrm_boosted/labels.csv
+      - src/modeling/train.py
+    params: 
+      - train.LightGBM
+      - train.XGBOOST
+    outs:
+      - models/model.joblib

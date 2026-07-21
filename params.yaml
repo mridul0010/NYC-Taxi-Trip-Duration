@@ -5,3 +5,26 @@ features_baseline:
 features_osrm:
   test_size : 0.2
   random_state : 42
+
+train:
+  LightGBM:
+    n_estimators: 784
+    max_depth: 12
+    num_leaves: 226
+    learning_rate: 0.09213947113262885
+    min_child_samples: 100
+    min_gain_to_split: 0.026639930463593284
+    reg_lambda: 14.623273479551953
+    reg_alpha: 4.46640877511908
+    subsample: 0.7624588246151371
+    colsample_bytree: 0.6562971945476482
+  
+  XGBOOST:
+    n_estimators: 625
+    max_depth: 12
+    learning_rate: 0.01817657646383304
+    subsample: 0.7382033538889818
+    min_child_weight: 24
+    gamma: 0.012833011282738694
+    reg_lambda: 6.893792887703962
+    colsample_bytree: 0.586048838662037
