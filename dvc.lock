@@ -1,0 +1,54 @@
+schema: '2.0'
+stages:
+  dataset_baseline:
+    cmd: python src/dataset_baseline.py
+    deps:
+    - path: data/raw/NYC.csv
+      hash: md5
+      md5: e59c291a4b1c640f1dab33b89daa22e1
+      size: 200589097
+    - path: src/dataset_baseline.py
+      hash: md5
+      md5: 3945b7a833f14a275f363f8e10b7dff7
+      size: 7577
+    - path: src/feature_definitions.py
+      hash: md5
+      md5: f1d7af539ddb89cca763768345b3786f
+      size: 993
+    outs:
+    - path: data/processed/baseline/processed_NYC.csv
+      hash: md5
+      md5: 3811b14f383f3d06f0117354f47f9d22
+      size: 178724812
+  features_baseline:
+    cmd: python src/features_baseline.py
+    deps:
+    - path: data/processed/baseline/processed_NYC.csv
+      hash: md5
+      md5: 3811b14f383f3d06f0117354f47f9d22
+      size: 178724812
+    - path: src/features_baseline.py
+      hash: md5
+      md5: 128651998a4e283d541a3103322dcdd8
+      size: 6973
+    params:
+      params.yaml:
+        features_baseline.random_state: 42
+        features_baseline.test_size: 0.2
+    outs:
+    - path: data/processed/baseline/features.csv
+      hash: md5
+      md5: 34b16fbd6eb11c0cebed8c9736bbb0d0
+      size: 446763109
+    - path: data/processed/baseline/features_test.csv
+      hash: md5
+      md5: 70c7b4f679f488ac9b326ec0f7eb5c78
+      size: 111693898
+    - path: data/processed/baseline/labels.csv
+      hash: md5
+      md5: 9ea9965c8b24a04e10eeb6dc81dcda96
+      size: 7206166
+    - path: data/processed/baseline/labels_test.csv
+      hash: md5
+      md5: 468986747358e4fa927a6adbd231aa27
+      size: 1801017

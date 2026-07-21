@@ -1,9 +1,9 @@
 stages:
   dataset_baseline:
-    cmd : python src/dataset.py
+    cmd : python src/dataset_baseline.py
     deps:
       - data/raw/NYC.csv
-      - src/dataset.py
+      - src/dataset_baseline.py
       - src/feature_definitions.py
     outs:
       - data/processed/baseline/processed_NYC.csv
