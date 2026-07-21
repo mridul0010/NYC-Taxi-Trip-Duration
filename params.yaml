@@ -1,0 +1,7 @@
+features_baseline:
+  test_size : 0.2
+  random_state : 42
+
+features_osrm:
+  test_size : 0.2
+  random_state : 42

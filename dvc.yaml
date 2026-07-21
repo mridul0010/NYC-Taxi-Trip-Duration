@@ -1,0 +1,22 @@
+stages:
+  dataset_baseline:
+    cmd : python src/dataset.py
+    deps:
+      - data/raw/NYC.csv
+      - src/dataset.py
+      - src/feature_definitions.py
+    outs:
+      - data/processed/baseline/processed_NYC.csv
+  features_baseline:
+    cmd : python src/features_baseline.py
+    deps :
+      - data/processed/baseline/processed_NYC.csv
+      - src/features_baseline.py
+    params :
+      - features_baseline.test_size
+      - features_baseline.random_state
+    outs :
+      - data/processed/baseline/features.csv
+      - data/processed/baseline/labels.csv
+      - data/processed/baseline/features_test.csv
+      - data/processed/baseline/labels_test.csv
