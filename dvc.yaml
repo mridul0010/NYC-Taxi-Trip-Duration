@@ -52,7 +52,7 @@ stages:
       - data/processed/osrm_boosted/labels.csv
       - src/modeling/train.py
     params: 
-      - train.LightGBM
-      - train.XGBOOST
+      - Train.LightGBM
+      - Train.XGBOOST
     outs:
       - models/model.joblib

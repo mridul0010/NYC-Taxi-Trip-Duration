@@ -6,7 +6,7 @@ features_osrm:
   test_size : 0.2
   random_state : 42
 
-train:
+Train:
   LightGBM:
     n_estimators: 784
     max_depth: 12
