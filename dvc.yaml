@@ -21,3 +21,26 @@ stages:
       - data/processed/baseline/labels.csv
       - data/processed/baseline/features_test.csv
       - data/processed/baseline/labels_test.csv
+
+  dataset_osrm:
+    cmd : python src/dataset_osrm.py
+    deps:
+      - data/raw/NYC.csv
+      - data/external/osrm_data.csv
+      - src/dataset_osrm.py
+    outs:
+      - data/processed/osrm_boosted/processed_osrm_NYC.csv
+
+  features_osrm:
+    cmd : python src/features_osrm.py
+    deps :
+      - data/processed/osrm_boosted/processed_osrm_NYC.csv
+      - src/features_osrm.py
+    params :
+      - features_osrm.test_size
+      - features_osrm.random_state
+    outs :
+      - data/processed/osrm_boosted/features.csv
+      - data/processed/osrm_boosted/labels.csv
+      - data/processed/osrm_boosted/features_test.csv
+      - data/processed/osrm_boosted/labels_test.csv
