@@ -14,10 +14,9 @@ from sklearn.ensemble import StackingRegressor
 from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor 
 from sklearn.preprocessing import PowerTransformer
-from sklearn.metrics import mean_absolute_error , r2_score , root_mean_squared_error
 from sklearn.compose import TransformedTargetRegressor
 
-from src.config import MODELS_DIR, PROJ_ROOT, TARGET_COLUMN , PROCESSED_DATA_DIR
+from src.config import MODELS_DIR, PROJ_ROOT, TARGET_COLUMN , TRAIN_INPUT_PATH 
 
 app = typer.Typer()
 
@@ -113,8 +112,8 @@ def _wait_for_file_ready(file_path: Path, timeout_seconds: int = 30, poll_interv
 
 @app.command()
 def main(
-    train_features_path: Path = PROCESSED_DATA_DIR / "osrm_boosted" / "features.csv",
-    train_labels_path: Path = PROCESSED_DATA_DIR / "osrm_boosted" / "labels.csv",
+    train_features_path: Path = TRAIN_INPUT_PATH / "features.csv",
+    train_labels_path: Path = TRAIN_INPUT_PATH / "labels.csv",
     model_path: Path = MODELS_DIR / "model.joblib",
     params_path: Path = PROJ_ROOT / "params.yaml",
 ):

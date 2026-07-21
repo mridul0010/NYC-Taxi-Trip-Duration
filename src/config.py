@@ -23,6 +23,10 @@ FIGURES_DIR = REPORTS_DIR / "figures"
 
 PARAMS_FILE = PROJ_ROOT / "params.yaml"
 
+TRAIN_INPUT_PATH = PROCESSED_DATA_DIR / "osrm_boosted"
+TEST_INPUT_PATH = PROCESSED_DATA_DIR / "osrm_boosted"
+
+
 AVG_EARTH_RADIUS = 6371
 
 # features.py

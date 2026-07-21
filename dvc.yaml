@@ -56,3 +56,16 @@ stages:
       - Train.XGBOOST
     outs:
       - models/model.joblib
+    
+  Model_Evaluating:
+    cmd : python src/modeling/predict.py
+    deps:
+      - data/processed/osrm_boosted/features.csv
+      - data/processed/osrm_boosted/labels.csv
+      - data/processed/osrm_boosted/features_test.csv
+      - data/processed/osrm_boosted/labels_test.csv
+      - models/model.joblib
+    outs:
+      - data/processed/test_predictions.csv
+      - reports/evaluation_metrics.json
+      - run_information.json

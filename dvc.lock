@@ -117,8 +117,8 @@ stages:
       size: 7206166
     - path: src/modeling/train.py
       hash: md5
-      md5: e14e81ed7770780299f29026d540d040
-      size: 5275
+      md5: 4d8d0b4d73b06b4146644c7a0ac22278
+      size: 5150
     params:
       params.yaml:
         Train.LightGBM:
@@ -144,5 +144,41 @@ stages:
     outs:
     - path: models/model.joblib
       hash: md5
-      md5: b9b20945b09d5d72ebbe24c965041362
+      md5: 7f345093519817126b19031ca37f7c64
       size: 81029505
+  Model_Evaluating:
+    cmd: python src/modeling/predict.py
+    deps:
+    - path: data/processed/osrm_boosted/features.csv
+      hash: md5
+      md5: 6f2e4ff723cc1686b56f196a064b37df
+      size: 553104863
+    - path: data/processed/osrm_boosted/features_test.csv
+      hash: md5
+      md5: 337acc5e18d9d1f8e839fbd9431e4843
+      size: 138280817
+    - path: data/processed/osrm_boosted/labels.csv
+      hash: md5
+      md5: 9ea9965c8b24a04e10eeb6dc81dcda96
+      size: 7206166
+    - path: data/processed/osrm_boosted/labels_test.csv
+      hash: md5
+      md5: 468986747358e4fa927a6adbd231aa27
+      size: 1801017
+    - path: models/model.joblib
+      hash: md5
+      md5: 7f345093519817126b19031ca37f7c64
+      size: 81029505
+    outs:
+    - path: data/processed/test_predictions.csv
+      hash: md5
+      md5: 39633f3a081ead93d05d534d232e42a3
+      size: 12388308
+    - path: reports/evaluation_metrics.json
+      hash: md5
+      md5: e06013e641dc4f6e87f447006e288890
+      size: 203
+    - path: run_information.json
+      hash: md5
+      md5: 2b4a10ead4cd4c0a078212e8701eebb4
+      size: 292
