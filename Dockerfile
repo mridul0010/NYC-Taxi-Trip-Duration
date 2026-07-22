@@ -39,6 +39,8 @@ COPY --chown=appuser:appuser . .
 # Ensure Streamlit local configuration runtime directories are writeable by appuser if needed
 RUN mkdir -p /app/.streamlit && chown -R appuser:appuser /app/.streamlit
 
+ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+
 # --- NOW SWITCH TO THE NON-PRIVILEGED USER ---
 USER appuser
 
