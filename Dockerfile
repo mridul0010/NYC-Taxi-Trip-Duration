@@ -43,7 +43,7 @@ RUN mkdir -p /app/models && \
     chmod -R 775 /app/models
 
 # Ensure Streamlit local configuration runtime directories are writeable by appuser if needed
-RUN mkdir -p /app/.streamlit && chown -R appuser:appuser /app/.streamlit[cite: 3]
+RUN mkdir -p /app/.streamlit && chown -R appuser:appuser /app/.streamlit
 
 ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
@@ -54,4 +54,4 @@ USER appuser
 EXPOSE 8501
 
 # Run the download script first, then launch the Streamlit application
-CMD ["sh", "-c", "python fetch_artifacts.py && streamlit run app.py --server.port=8501 --server.address=0.0.0.0"][cite: 3]
+CMD ["sh", "-c", "python fetch_artifacts.py && streamlit run app.py --server.port=8501 --server.address=0.0.0.0"]
