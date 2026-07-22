@@ -2,7 +2,7 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ "master" ] # Trigger on master branch updates
+    branches: [ "master" ]
 
 permissions:
   id-token: write
