@@ -112,3 +112,4 @@ jobs:
             --ipc="host" \
             --name=trip-duration \
             $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            
