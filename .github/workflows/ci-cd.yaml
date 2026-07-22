@@ -115,4 +115,5 @@ jobs:
             -e AWS_REGION="${{ secrets.AWS_REGION }}" \
             -e AWS_S3_BUCKET="${{ secrets.AWS_BUCKET_NAME }}" \
             -e AWS_MODEL_KEY="${{ secrets.AWS_MODEL_KEY }}" \
+            -e AWS_PREPROCESSOR_KEY="${{ secrets.AWS_PREPROCESSOR_KEY }}" \
             $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
