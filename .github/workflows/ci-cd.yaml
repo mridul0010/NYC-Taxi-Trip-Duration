@@ -61,11 +61,8 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
           IMAGE_TAG: latest
         run: |
-          # Build a docker container and push it to ECR
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          
-          # Modern GitHub output syntax
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
   
   Continuous-Deployment:
@@ -100,17 +97,29 @@ jobs:
           docker rm -f trip-duration || true
           docker system prune -f
 
+      - name: Force Permissions and Verify Artifacts
+        run: |
+          # 1. Ensure the models directory exists on the host
+          mkdir -p ${{ github.workspace }}/models
+          
+          # 2. Give total read/write permission so the container's appuser (UID 10001) can read it
+          sudo chmod -R 777 ${{ github.workspace }}/models
+          
+          # 3. Debug line to verify if files are actually present on the host
+          echo "=== CHECKING BUNDLED ARTIFACTS ==="
+          ls -la ${{ github.workspace }}/models
+
       - name: Run Docker Image to serve users
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
           IMAGE_TAG: latest
         run: |
-          # Bas port ko Streamlit ke liye 8501 kiya hai aur volume mount kar diya hai taaki models mil jayein[cite: 3]
           docker run -d \
             -p 8501:8501 \
             --ipc="host" \
             --name=trip-duration \
+            --restart always \
             -v ${{ github.workspace }}/models:/app/models \
             -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \

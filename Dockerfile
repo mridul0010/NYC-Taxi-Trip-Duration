@@ -36,6 +36,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Copy the source code, configs, models, and reports into the container AND grant ownership to appuser
 COPY --chown=appuser:appuser . .
 
+# Explicitly ensure models directory exists, has bundled files, and belongs to appuser
+RUN mkdir -p /app/models && chown -R appuser:appuser /app/models && chmod -R 755 /app/models
+
 # Ensure Streamlit local configuration runtime directories are writeable by appuser if needed
 RUN mkdir -p /app/.streamlit && chown -R appuser:appuser /app/.streamlit
 
