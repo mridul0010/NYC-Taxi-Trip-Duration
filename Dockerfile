@@ -50,5 +50,5 @@ USER appuser
 # Expose the standard port that Streamlit listens on.
 EXPOSE 8501
 
-# Run the updated Streamlit application directly.
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Run the download script first, then launch the Streamlit application
+CMD ["sh", "-c", "python fetch_artifacts.py && streamlit run app.py --server.port=8501 --server.address=0.0.0.0"]
