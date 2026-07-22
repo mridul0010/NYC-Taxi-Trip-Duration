@@ -115,3 +115,8 @@ jobs:
             -e AWS_BUCKET_NAME="${{ secrets.AWS_BUCKET_NAME }}" \
             -e AWS_MODEL_KEY="${{ secrets.AWS_MODEL_KEY }}" \
             $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      # --- AUTOMATED STORAGE CLEANUP ---
+      - name: Clean up old Docker data
+        run: |
+          docker system prune -a -f
