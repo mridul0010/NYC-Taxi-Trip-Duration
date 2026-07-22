@@ -12,3 +12,4 @@ reverse-geocoder
 tqdm
 typer
 httpx
+PyYAML
