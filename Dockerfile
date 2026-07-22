@@ -43,4 +43,4 @@ USER appuser
 EXPOSE 8000
 
 # Run the application (fetches model from S3, then starts FastAPI).
-CMD ["sh", "-c", "python pull_model.py && uvicorn app.api:app --host=0.0.0.0 --port=8000"]
+CMD ["sh", "-c", "python fetch_artifacts.py && uvicorn app.api:app --host=0.0.0.0 --port=8000"]
