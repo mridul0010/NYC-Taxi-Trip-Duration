@@ -13,3 +13,4 @@ tqdm
 typer
 httpx
 PyYAML
+streamlit
