@@ -11,3 +11,4 @@ pandas
 reverse-geocoder
 tqdm
 typer
+httpx
