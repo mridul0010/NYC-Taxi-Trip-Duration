@@ -1,0 +1,4 @@
+[core]
+    remote = trip_duration
+['remote "trip_duration"']
+    url = s3://nyc-taxi-trip-duration-project

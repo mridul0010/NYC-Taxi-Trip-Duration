@@ -74,7 +74,7 @@ async def predict_duration(payload: TaxiPredictionRequest):
     input_dict = payload.model_dump()
     
     # Crucial Pipeline Fix: extract_temporal_features drops 'trip_duration' after tracking it
-    # We add a temporary dummy value here so your pandas pipeline does not crash
+    # We add a temporary dummy value here so pandas pipeline does not crash
     input_dict["trip_duration"] = 0.0
 
     # 2. Automatically fetch real-time OSRM routing metrics behind the scenes

@@ -1,13 +1,13 @@
-awscli
+fastapi
+uvicorn
 loguru
-mkdocs
-pip
 python-dotenv
+boto3
+joblib
+scikit-learn
+xgboost
+lightgbm
+pandas
 reverse-geocoder
-ruff
 tqdm
 typer
-uvicorn
-fastapi
-httpx
--e .

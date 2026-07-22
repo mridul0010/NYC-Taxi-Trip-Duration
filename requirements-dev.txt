@@ -1,0 +1,7 @@
+awscli
+mkdocs
+ruff
+httpx
+dvc[s3]
+-e .
+pip
