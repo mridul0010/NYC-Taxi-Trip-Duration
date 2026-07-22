@@ -27,11 +27,16 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
-# --- FIX IS HERE ---
 # Copy the source code into the container AND grant ownership to appuser
 COPY --chown=appuser:appuser . .
 
-# Switch to the non-privileged user to run the application.
+# --- RUN THESE AS ROOT FIRST ---
+# Ensure the models directory exists inside the container's working directory
+RUN mkdir -p /app/models
+# Grant ownership of the folder to appuser so it can write to it
+RUN chown -R appuser:appuser /app/models
+
+# --- NOW SWITCH TO THE NON-PRIVILEGED USER ---
 USER appuser
 
 # Expose the port that the application listens on.

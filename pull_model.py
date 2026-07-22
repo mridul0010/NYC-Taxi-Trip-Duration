@@ -8,7 +8,7 @@ def download_production_model():
     # (Avoids hardcoding bucket names or model paths)
     bucket_name = os.getenv("AWS_S3_BUCKET")
     s3_model_key = os.getenv("AWS_MODEL_KEY")
-    local_model_path = "models/model.joblib"
+    local_model_path = os.path.join("/app", "models", "model.joblib")  
 
     # Ensure the local target directory exists inside the container
     os.makedirs(os.path.dirname(local_model_path), exist_ok=True)
