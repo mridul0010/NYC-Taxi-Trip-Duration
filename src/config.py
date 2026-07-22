@@ -2,6 +2,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from loguru import logger
+import os
 
 # Load environment variables from .env file if it exists
 load_dotenv()
@@ -83,7 +84,13 @@ LOG_TRANSFORM_FEATURES_OSRM = [
 ]
 
 
+# Configuration & Paths
+MODEL_DIR = Path("./models")
+PREPROCESSOR_PATH = MODEL_DIR / "preprocessor_osrm.joblib"
+MODEL_PATH = MODEL_DIR / "model.joblib"
 
+# FastAPI
+OSRM_BASE_URL = os.getenv("OSRM_BASE_URL", "http://router.project-osrm.org")
 
 
 # If tqdm is installed, configure loguru with tqdm.write
