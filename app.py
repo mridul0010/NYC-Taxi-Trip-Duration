@@ -36,53 +36,172 @@ def load_models():
 
 @st.cache_data(show_spinner=False)
 def load_dynamic_zones() -> tuple[list, list]:
-    """Extract unique pickup/dropoff zones from processed datasets."""
-    pickup_zones: set = set()
-    dropoff_zones: set = set()
-
-    # Primary source: processed datasets that contain human-readable zone features.
-    candidate_files = [
-        Path("data/processed/baseline/processed_NYC.csv"),
-        Path("data/processed/osrm_boosted/processed_osrm_NYC.csv"),
+    """Return hardcoded pickup/dropoff zones for the dropdowns."""
+    pickup_zones = [
+        "Atlantic Beach",
+        "Bayonne",
+        "Bellerose",
+        "Bellerose Terrace",
+        "Bensonhurst",
+        "Bogota",
+        "Borough of Queens",
+        "Brooklyn",
+        "Carteret",
+        "Coney Island",
+        "East Atlantic Beach",
+        "East New York",
+        "East Rutherford",
+        "Eastchester",
+        "Edgewater",
+        "Elizabeth",
+        "Fort Lee",
+        "Great Neck Plaza",
+        "Guttenberg",
+        "Hackensack",
+        "Harrison",
+        "Hasbrouck Heights",
+        "Hoboken",
+        "Inwood",
+        "Jamaica",
+        "Jersey City",
+        "Kings Point",
+        "Lake Success",
+        "Lawrence",
+        "Leonia",
+        "Long Island City",
+        "Manhattan",
+        "Mount Vernon",
+        "New Rochelle",
+        "New York City",
+        "Newark",
+        "North New Hyde Park",
+        "Pelham Manor",
+        "Ridgefield",
+        "Secaucus",
+        "South Valley Stream",
+        "The Bronx",
+        "Union City",
+        "University Gardens",
+        "Weehawken",
+        "Yonkers",
     ]
-    for file_path in candidate_files:
-        if not file_path.exists():
-            continue
-        try:
-            zones_df = pd.read_csv(file_path, usecols=["pickup_zone", "dropoff_zone"])
-            pickup_zones.update(zones_df["pickup_zone"].dropna().astype(str).str.strip().unique())
-            dropoff_zones.update(zones_df["dropoff_zone"].dropna().astype(str).str.strip().unique())
-        except Exception:
-            continue
 
-    if pickup_zones and dropoff_zones:
-        return sorted(pickup_zones), sorted(dropoff_zones)
+    dropoff_zones = [
+        "Atlantic Beach",
+        "Bayonne",
+        "Bellerose",
+        "Bellerose Terrace",
+        "Belleville",
+        "Bensonhurst",
+        "Bergenfield",
+        "Bloomfield",
+        "Bogota",
+        "Borough of Queens",
+        "Brookdale",
+        "Brooklyn",
+        "Carlstadt",
+        "Carteret",
+        "Cedar Grove",
+        "Cedarhurst",
+        "Cliffside Park",
+        "Clifton",
+        "Coney Island",
+        "East Atlantic Beach",
+        "East New York",
+        "East Newark",
+        "East Orange",
+        "East Rutherford",
+        "Eastchester",
+        "Edgewater",
+        "Elizabeth",
+        "Elmont",
+        "Elmwood Park",
+        "Englewood",
+        "Englewood Cliffs",
+        "Fairview",
+        "Floral Park",
+        "Fort Lee",
+        "Glen Ridge",
+        "Great Neck",
+        "Great Neck Estates",
+        "Great Neck Gardens",
+        "Great Neck Plaza",
+        "Guttenberg",
+        "Hackensack",
+        "Harrison",
+        "Hasbrouck Heights",
+        "Hewlett",
+        "Highlands",
+        "Hillside",
+        "Hoboken",
+        "Inwood",
+        "Irvington",
+        "Jamaica",
+        "Jersey City",
+        "Kearny",
+        "Kings Point",
+        "Lake Success",
+        "Lawrence",
+        "Leonia",
+        "Linden",
+        "Little Ferry",
+        "Lodi",
+        "Long Island City",
+        "Lyndhurst",
+        "Manhasset",
+        "Manhattan",
+        "Maywood",
+        "Montclair",
+        "Moonachie",
+        "Mount Vernon",
+        "New Rochelle",
+        "New York City",
+        "Newark",
+        "North Arlington",
+        "North Bergen",
+        "North New Hyde Park",
+        "North Valley Stream",
+        "Nutley",
+        "Orange",
+        "Palisades Park",
+        "Passaic",
+        "Paterson",
+        "Pelham",
+        "Pelham Manor",
+        "Perth Amboy",
+        "Plandome Heights",
+        "Ridgefield",
+        "Ridgefield Park",
+        "Roselle",
+        "Rutherford",
+        "Saddle Brook",
+        "Sands Point",
+        "Secaucus",
+        "Singac",
+        "South Floral Park",
+        "South Valley Stream",
+        "Staten Island",
+        "Teaneck",
+        "Tenafly",
+        "The Bronx",
+        "Thomaston",
+        "Totowa",
+        "Union",
+        "Union City",
+        "University Gardens",
+        "Upper Montclair",
+        "Valley Stream",
+        "Verona",
+        "Wallington",
+        "Weehawken",
+        "West New York",
+        "West Orange",
+        "Woodland Park",
+        "Woodmere",
+        "Yonkers",
+    ]
 
-    # Fallback to model-derived categories if dataset files are unavailable.
-    try:
-        preprocessor, _ = load_models()
-        if hasattr(preprocessor, "named_transformers_") and "cat" in preprocessor.named_transformers_:
-            encoder = preprocessor.named_transformers_["cat"].named_steps.get("onehot")
-            if encoder and hasattr(encoder, "categories_"):
-                categories = [sorted(list(cat)) for cat in encoder.categories_]
-                if len(categories) >= 2:
-                    return categories[0], categories[1]
-                if len(categories) == 1:
-                    return categories[0], categories[0]
-        
-        if hasattr(preprocessor, "steps"):
-            for name, step in preprocessor.steps:
-                if hasattr(step, "pickup_zone_categories") or hasattr(step, "dropoff_zone_categories"):
-                    pickup = sorted(list(getattr(step, "pickup_zone_categories", [])))
-                    dropoff = sorted(list(getattr(step, "dropoff_zone_categories", pickup)))
-                    if pickup:
-                        return pickup, dropoff or pickup
-    except Exception:
-        pass
-
-    # Last-resort fallback for safe UI rendering.
-    defaults = ["Manhattan", "Brooklyn", "Queens", "The Bronx", "Staten Island", "JFK Airport", "LaGuardia Airport"]
-    return defaults, defaults
+    return pickup_zones, dropoff_zones
 
 def run_raw_preprocessing(df: pd.DataFrame) -> pd.DataFrame:
     """Apply the same preprocessing flow used by the API pipeline."""
