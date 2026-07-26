@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG PYTHON_VERSION=3.10.16
-FROM python:${PYTHON_VERSION}-slim as base
+FROM python:${PYTHON_VERSION}-slim AS base
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -36,9 +36,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Copy the source code, configs, models, and reports into the container AND grant ownership to appuser
 COPY --chown=appuser:appuser . .
 
-# Explicitly ensure models directory exists, is completely clean for S3 sync, and belongs to appuser
+# Ensure models directory exists and belongs to appuser.
 RUN mkdir -p /app/models && \
-    rm -rf /app/models/* && \
     chown -R appuser:appuser /app/models && \
     chmod -R 775 /app/models
 
