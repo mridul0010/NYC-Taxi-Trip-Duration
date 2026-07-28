@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import httpx
 from fastapi import FastAPI, HTTPException
+from shapely.geometry import Point, Polygon  # NEW: Imported for geographic guardrails
 
 # Import your pipeline functions exactly as written in your scripts
 from src.feature_definitions import haversine_array, dummy_manhattan_distance, bearing_array
@@ -68,8 +69,44 @@ def run_raw_preprocessing(df: pd.DataFrame) -> pd.DataFrame:
         .pipe(drop_features)
     )
 
+# --- NEW: Guardrail Validation Logic ---
+def is_valid_tlc_location(lat: float, lon: float) -> bool:
+    """
+    Checks if a coordinate falls strictly within the permitted NYC TLC zone polygon.
+    (5 boroughs, Nassau, Westchester, Newark Airport)
+    """
+    point = Point(lon, lat)
+    
+    nyc_tlc_zone = Polygon([
+        (-74.25, 40.50), # Bottom Left (Staten Island)
+        (-73.70, 40.55), # Bottom Right (Queens/Nassau edge)
+        (-73.40, 40.85), # Top Right (Nassau/Westchester edge)
+        (-73.90, 41.38), # Top (Westchester)
+        (-74.00, 40.80), # Top Left (Bronx/Manhattan edge)
+        (-74.25, 40.50)  # Close the loop
+    ])
+    
+    return nyc_tlc_zone.contains(point)
+# ---------------------------------------
+
 @app.post("/predict")
 async def predict_duration(payload: TaxiPredictionRequest):
+    
+    # --- STEP 1: APPLY GUARDRAILS ---
+    # We check this FIRST to save processing power and avoid unnecessary OSRM API calls
+    if not is_valid_tlc_location(payload.pickup_latitude, payload.pickup_longitude):
+        raise HTTPException(
+            status_code=400, 
+            detail="🚫 Guardrail Activated: Pickup location is outside the permitted NYC TLC zone."
+        )
+        
+    if not is_valid_tlc_location(payload.dropoff_latitude, payload.dropoff_longitude):
+        raise HTTPException(
+            status_code=400, 
+            detail="🚫 Guardrail Activated: Dropoff location is outside the permitted NYC TLC zone."
+        )
+    # --------------------------------
+
     # 1. Convert input request schema to dictionary
     input_dict = payload.model_dump()
     

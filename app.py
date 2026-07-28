@@ -9,6 +9,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
+from shapely.geometry import Point, Polygon
 
 from src.config import MODEL_PATH, OSRM_BASE_URL, PREPROCESSOR_PATH
 from src.features_osrm import NYCTaxiFeatureEngineer
@@ -37,171 +38,125 @@ def load_models():
 @st.cache_data(show_spinner=False)
 def load_dynamic_zones() -> tuple[list, list]:
     """Return hardcoded pickup/dropoff zones for the dropdowns."""
-    pickup_zones = [
-        "Atlantic Beach",
-        "Bayonne",
-        "Bellerose",
-        "Bellerose Terrace",
-        "Bensonhurst",
-        "Bogota",
-        "Borough of Queens",
-        "Brooklyn",
-        "Carteret",
-        "Coney Island",
-        "East Atlantic Beach",
-        "East New York",
-        "East Rutherford",
-        "Eastchester",
-        "Edgewater",
-        "Elizabeth",
-        "Fort Lee",
-        "Great Neck Plaza",
-        "Guttenberg",
-        "Hackensack",
-        "Harrison",
-        "Hasbrouck Heights",
-        "Hoboken",
-        "Inwood",
-        "Jamaica",
-        "Jersey City",
-        "Kings Point",
-        "Lake Success",
-        "Lawrence",
-        "Leonia",
-        "Long Island City",
-        "Manhattan",
-        "Mount Vernon",
-        "New Rochelle",
-        "New York City",
-        "Newark",
-        "North New Hyde Park",
-        "Pelham Manor",
-        "Ridgefield",
-        "Secaucus",
-        "South Valley Stream",
-        "The Bronx",
-        "Union City",
-        "University Gardens",
-        "Weehawken",
-        "Yonkers",
-    ]
+    pickup_zones = ['Manhattan', 'Long Island City', 'New York City', 'Weehawken',
+       'Jamaica', 'The Bronx', 'Edgewater', 'Inwood', 'Hoboken',
+       'Guttenberg', 'Brooklyn', 'Bensonhurst', 'Borough of Queens',
+       'East New York', 'Fort Lee', 'East Atlantic Beach', 'Eastchester',
+       'Jersey City', 'Coney Island', 'South Valley Stream',
+       'Bellerose Terrace', 'Yonkers', 'Bayonne', 'Pelham Manor',
+       'Atlantic Beach', 'East Rutherford', 'Newark', 'Garfield',
+       'Carteret', 'Bellerose', 'Lake Success', 'University Gardens',
+       'Kings Point', 'Mount Vernon', 'Great Neck Plaza', 'New Rochelle',
+       'Elizabeth', 'Lawrence', 'Secaucus', 'Union City', 'Ridgefield',
+       'Leonia', 'North New Hyde Park', 'Harrison', 'Hackensack',
+       'Bogota', 'Hasbrouck Heights']
 
-    dropoff_zones = [
-        "Atlantic Beach",
-        "Bayonne",
-        "Bellerose",
-        "Bellerose Terrace",
-        "Belleville",
-        "Bensonhurst",
-        "Bergenfield",
-        "Bloomfield",
-        "Bogota",
-        "Borough of Queens",
-        "Brookdale",
-        "Brooklyn",
-        "Carlstadt",
-        "Carteret",
-        "Cedar Grove",
-        "Cedarhurst",
-        "Cliffside Park",
-        "Clifton",
-        "Coney Island",
-        "East Atlantic Beach",
-        "East New York",
-        "East Newark",
-        "East Orange",
-        "East Rutherford",
-        "Eastchester",
-        "Edgewater",
-        "Elizabeth",
-        "Elmont",
-        "Elmwood Park",
-        "Englewood",
-        "Englewood Cliffs",
-        "Fairview",
-        "Floral Park",
-        "Fort Lee",
-        "Glen Ridge",
-        "Great Neck",
-        "Great Neck Estates",
-        "Great Neck Gardens",
-        "Great Neck Plaza",
-        "Guttenberg",
-        "Hackensack",
-        "Harrison",
-        "Hasbrouck Heights",
-        "Hewlett",
-        "Highlands",
-        "Hillside",
-        "Hoboken",
-        "Inwood",
-        "Irvington",
-        "Jamaica",
-        "Jersey City",
-        "Kearny",
-        "Kings Point",
-        "Lake Success",
-        "Lawrence",
-        "Leonia",
-        "Linden",
-        "Little Ferry",
-        "Lodi",
-        "Long Island City",
-        "Lyndhurst",
-        "Manhasset",
-        "Manhattan",
-        "Maywood",
-        "Montclair",
-        "Moonachie",
-        "Mount Vernon",
-        "New Rochelle",
-        "New York City",
-        "Newark",
-        "North Arlington",
-        "North Bergen",
-        "North New Hyde Park",
-        "North Valley Stream",
-        "Nutley",
-        "Orange",
-        "Palisades Park",
-        "Passaic",
-        "Paterson",
-        "Pelham",
-        "Pelham Manor",
-        "Perth Amboy",
-        "Plandome Heights",
-        "Ridgefield",
-        "Ridgefield Park",
-        "Roselle",
-        "Rutherford",
-        "Saddle Brook",
-        "Sands Point",
-        "Secaucus",
-        "Singac",
-        "South Floral Park",
-        "South Valley Stream",
-        "Staten Island",
-        "Teaneck",
-        "Tenafly",
-        "The Bronx",
-        "Thomaston",
-        "Totowa",
-        "Union",
-        "Union City",
-        "University Gardens",
-        "Upper Montclair",
-        "Valley Stream",
-        "Verona",
-        "Wallington",
-        "Weehawken",
-        "West New York",
-        "West Orange",
-        "Woodland Park",
-        "Woodmere",
-        "Yonkers",
-    ]
+    dropoff_zones = ['Manhattan', 'New York City', 'Weehawken', 'Long Island City',
+       'Inwood', 'Brooklyn', 'The Bronx', 'Jamaica', 'Hoboken',
+       'Borough of Queens', 'Dobbs Ferry', 'Guttenberg', 'East New York',
+       'Edgewater', 'Elizabeth', 'Coney Island', 'Bensonhurst',
+       'Fort Lee', 'Rockville Centre', 'Cos Cob', 'Newark', 'Colonia',
+       'Secaucus', 'Bellerose Terrace', 'Bloomfield',
+       'East Atlantic Beach', 'University Gardens', 'Yonkers', 'Bayonne',
+       'Eastchester', 'Jersey City', 'Valley Stream', 'Larchmont',
+       'Baldwin', 'Palisades Park', 'Essex Fells', 'Bronxville',
+       'Chatham', 'Oceanside', 'Englewood', 'North New Hyde Park',
+       'Guilford', 'Elmont', 'Bellerose', 'South Nyack', 'Floral Park',
+       'Stamford', 'Staten Island', 'Mount Vernon', 'Cliffside Park',
+       'Old Bethpage', 'South Valley Stream', 'Woodmere', 'Bayville',
+       'Elmsford', 'Old Brookville', 'Port Chester', 'Great Neck',
+       'Lake Success', 'Malverne', 'White Plains', 'Carle Place',
+       'Tarrytown', 'Rye', 'Elmwood Park', 'Hewlett', 'Plainview',
+       'Caldwell', 'Long Beach', 'Great Neck Plaza', 'Purchase',
+       'Hewlett Harbor', 'Tuckahoe', 'Hastings-on-Hudson', 'Northfield',
+       'East Rutherford', 'Garden City South', 'Pelham Manor',
+       'West New York', 'South Hempstead', 'Hasbrouck Heights',
+       'Manhasset Hills', 'Nutley', 'Mineola', 'East Hanover',
+       'East Meadow', 'Lynbrook', 'Port Washington North',
+       'Garden City Park', 'Verona', 'New Providence', 'Martinsville',
+       'Harrison', 'Hauppauge', 'Upper Montclair', 'Lawrence',
+       'Sands Point', 'Union City', 'Melville', 'North Haledon',
+       'Great Neck Estates', 'East Newark', 'Locust Valley',
+       'Atlantic Beach', 'Westbury', 'North Valley Stream', 'Cedarhurst',
+       'Woodbridge', 'Hempstead', 'Huntington', 'Bogota', 'Manhasset',
+       'Ossining', 'Carteret', 'Heritage Hills', 'Port Washington',
+       'Bellmore', 'Upper Brookville', 'Cold Spring Harbor', 'Merrick',
+       'Greenwich', 'Lakeview', 'Syosset', 'Maplewood', 'Fairfield',
+       'Garden City', 'Saddle Brook', 'Scarsdale', 'Rutherford',
+       'Cedar Grove', 'Orange', 'Totowa', 'East Hills', 'Union',
+       'Morris Plains', 'Fair Lawn', 'Searingtown', 'Glen Ridge', 'Lodi',
+       'Flower Hill', 'Roslyn Heights', 'Montvale', 'Massapequa',
+       'Mount Kisco', 'Englewood Cliffs', 'North Bergen',
+       'Plainsboro Center', 'Stewart Manor', 'Kearny', 'Levittown',
+       'New Cassel', 'Leonia', 'New Hyde Park', 'Tenafly', 'Iselin',
+       'Rye Brook', 'Parsippany', 'Ardsley', 'Hillside', 'Bergenfield',
+       'Jericho', 'Williston Park', 'North Stamford', 'Pelham',
+       'Smithtown', 'Bedford Hills', 'Fords', 'Island Park',
+       'Princeton Junction', 'West Orange', 'Salisbury', 'Hopewell',
+       'Barnum Island', 'South Floral Park', 'Woodland Park', 'Hartsdale',
+       'Summit', 'Hicksville', 'Thomaston', 'Sparkill', 'West Hempstead',
+       'Plandome Heights', 'Freeport', 'Nyack', 'Whitehouse Station',
+       'Montclair', 'East Orange', 'Glenville', 'Centerport', 'Paramus',
+       'Livingston', 'Florham Park', 'Munsey Park', 'Old Greenwich',
+       'East Garden City', 'East Rockaway', 'Baldwin Harbor', 'Glen Cove',
+       'Spring Valley', 'Somerville', 'Kings Point', 'Ronkonkoma',
+       'Passaic', 'Hackensack', 'Haworth', 'Society Hill', 'Uniondale',
+       'Paterson', 'Park Ridge', 'Budd Lake', 'Morristown', 'Mamaroneck',
+       'Mountainside', 'Metuchen', 'Lake Carmel', 'Fairview',
+       'Ridgefield Park', 'Cresskill', 'Point Lookout', 'Dix Hills',
+       'New Rochelle', 'Belleville', 'Muttontown', 'Old Tappan',
+       'Islandia', 'Moonachie', 'Holtsville', 'Massapequa Park',
+       'Highlands', 'Norwalk', 'Bay Shore', 'Greenburgh', 'New Haven',
+       'Central Valley', 'Warren Township', 'New Brunswick',
+       'Springfield', 'North Arlington', 'Ramsey', 'Little Ferry',
+       'Monsey', 'Herricks', 'Riverside', 'Teaneck', 'Chappaqua',
+       'Franklin Square', 'Great Neck Gardens', 'Short Hills', 'Edison',
+       'Perth Amboy', 'Midland Park', 'Singac', 'Sound Beach',
+       'Upper Saddle River', 'Peapack', 'Demarest', 'Glen Head',
+       'Mahopac', 'Ridgewood', 'Byram', 'Greenville', 'Allendale',
+       'Clifton', 'River Edge', 'North Hills', 'Glenwood Landing',
+       'Nanuet', 'Rochelle Park', 'Roslyn', 'Brookdale', 'Madison',
+       'Oakland', 'Irvington', 'Lyndhurst', 'North Amityville',
+       'Deer Park', 'East Farmingdale', 'Hightstown', 'Maywood',
+       'West Bay Shore', 'Woodbury', 'Greenvale', 'Brookville', 'Roselle',
+       'East Brunswick', 'Ho-Ho-Kus', 'Laurel Hollow', 'Marlboro',
+       'Woodcliff Lake', 'Southport', 'Calverton', 'Armonk', 'Rahway',
+       'Brewster Hill', 'Roslyn Estates', 'Bethpage', 'Hillsdale',
+       'Kenilworth', 'Northvale', 'Valhalla', 'Hanover', 'Saddle River',
+       'Farmingdale', 'Oyster Bay', 'Seaford', 'Briarcliff Manor',
+       'Bernardsville', 'Roosevelt', 'Hamden', 'Elwood', 'South Amboy',
+       'Carlstadt', 'South Huntington', 'Central Islip', 'West Point',
+       'Sleepy Hollow', 'Sea Cliff', 'South Orange', 'Milford',
+       'Kendall Park', 'North Bellmore', 'Plandome', 'Pearl River',
+       'Keansburg', 'East Williston', 'Linden', 'Alpine', 'North Merrick',
+       'Glen Rock', 'Suffern', 'Piscataway', 'Highland Park',
+       'North Wantagh', 'Albertson', 'Darien', 'Ridgefield',
+       'West Babylon', 'Lindenhurst', 'South Bound Brook', 'Wallington',
+       'Bardonia']
 
     return pickup_zones, dropoff_zones
+
+# --- NEW: Guardrail Validation Logic ---
+def is_valid_tlc_location(lat: float, lon: float) -> bool:
+    """
+    Checks if a coordinate falls strictly within the permitted NYC TLC zone polygon.
+    (5 boroughs, Nassau, Westchester, Newark Airport)
+    """
+    # Create a point object (Shapely uses Longitude (X), Latitude (Y))
+    point = Point(lon, lat)
+    
+    # Define the exact polygon boundary of the allowed zone
+    nyc_tlc_zone = Polygon([
+        (-74.25, 40.50), # Bottom Left (Staten Island)
+        (-73.70, 40.55), # Bottom Right (Queens/Nassau edge)
+        (-73.40, 40.85), # Top Right (Nassau/Westchester edge)
+        (-73.90, 41.38), # Top (Westchester)
+        (-74.00, 40.80), # Top Left (Bronx/Manhattan edge)
+        (-74.25, 40.50)  # Close the loop
+    ])
+    
+    return nyc_tlc_zone.contains(point)
+# ---------------------------------------
 
 def run_raw_preprocessing(df: pd.DataFrame) -> pd.DataFrame:
     """Apply the same preprocessing flow used by the API pipeline."""
@@ -392,7 +347,7 @@ def main() -> None:
     render_sidebar()
     now = datetime.now().replace(microsecond=0)
 
-    # Dynamic dynamic initialization - Pure pipeline components se fetch karega 
+    # Dynamic dynamic initialization
     pickup_regions, dropoff_regions = load_dynamic_zones()
 
     # Session State Initialization
@@ -422,7 +377,6 @@ def main() -> None:
                 p_query = urllib.parse.quote_plus(f"{helper_pickup}, New York")
                 st.markdown(f"🔗 [Search '{helper_pickup}' on Maps](https://www.google.com/maps/search/?api=1&query={p_query})")
             with c2:
-                # Array index management out of bounds exception se bachne ke liye logic
                 default_drop_idx = min(4, len(dropoff_regions) - 1) if len(dropoff_regions) > 0 else 0
                 helper_dropoff = st.selectbox("Find Dropoff Zone:", options=dropoff_regions, index=default_drop_idx)
                 d_query = urllib.parse.quote_plus(f"{helper_dropoff}, New York")
@@ -465,41 +419,50 @@ def main() -> None:
             submitted = st.form_submit_button("Predict trip duration", use_container_width=True)
 
         if submitted:
-            pickup_str = f"{p_date.strftime('%Y-%m-%d')} {p_time.strftime('%H:%M:%S')}"
-            dropoff_str = f"{d_date.strftime('%Y-%m-%d')} {d_time.strftime('%H:%M:%S')}"
+            # --- GUARDRAIL CHECK ---
+            # Check if pickup or dropoff falls outside our designated TLC boundaries
+            if not is_valid_tlc_location(float(p_lat), float(p_lon)):
+                st.error("🚫 Guardrail Activated: Pickup location is outside the permitted NYC TLC zone (5 boroughs, Nassau, Westchester).")
+            elif not is_valid_tlc_location(float(d_lat), float(d_lon)):
+                st.error("🚫 Guardrail Activated: Dropoff location is outside the permitted NYC TLC zone (5 boroughs, Nassau, Westchester).")
+            else:
+                # If they pass the geographic tests, proceed with model inference
+                pickup_str = f"{p_date.strftime('%Y-%m-%d')} {p_time.strftime('%H:%M:%S')}"
+                dropoff_str = f"{d_date.strftime('%Y-%m-%d')} {d_time.strftime('%H:%M:%S')}"
 
-            payload = {
-                "vendor_id": int(vendor_id),
-                "pickup_datetime": pickup_str,
-                "dropoff_datetime": dropoff_str,
-                "passenger_count": int(passenger_count),
-                "pickup_longitude": float(p_lon),
-                "pickup_latitude": float(p_lat),
-                "dropoff_longitude": float(d_lon),
-                "dropoff_latitude": float(d_lat),
-                "store_and_fwd_flag": store_and_fwd_flag,
-            }
+                payload = {
+                    "vendor_id": int(vendor_id),
+                    "pickup_datetime": pickup_str,
+                    "dropoff_datetime": dropoff_str,
+                    "passenger_count": int(passenger_count),
+                    "pickup_longitude": float(p_lon),
+                    "pickup_latitude": float(p_lat),
+                    "dropoff_longitude": float(d_lon),
+                    "dropoff_latitude": float(d_lat),
+                    "store_and_fwd_flag": store_and_fwd_flag,
+                }
 
-            try:
-                result = predict_trip_duration(payload)
-                st.success("🎉 Prediction complete!")
+                try:
+                    with st.spinner("Checking route constraints and generating prediction..."):
+                        result = predict_trip_duration(payload)
+                    st.success("🎉 Prediction complete!")
 
-                col_a, col_b, col_c = st.columns(3)
-                col_a.metric("Predicted duration", f"{result['predicted_trip_duration_minutes']} min")
-                col_b.metric("Estimated distance", f"{result['route_distance_km']} km")
-                col_c.metric("Route steps", result["route_steps"])
+                    col_a, col_b, col_c = st.columns(3)
+                    col_a.metric("Predicted duration", f"{result['predicted_trip_duration_minutes']} min")
+                    col_b.metric("Estimated distance", f"{result['route_distance_km']} km")
+                    col_c.metric("Route steps", result["route_steps"])
 
-                if result["predicted_trip_duration_minutes"] < 15:
-                    st.info("⚡ This looks like a quick city hop.")
-                elif result["predicted_trip_duration_minutes"] < 30:
-                    st.info("🗺️ This is a typical midtown-style ride.")
-                else:
-                    st.info("🌙 This looks like a longer cross-borough trip.")
+                    if result["predicted_trip_duration_minutes"] < 15:
+                        st.info("⚡ This looks like a quick city hop.")
+                    elif result["predicted_trip_duration_minutes"] < 30:
+                        st.info("🗺️ This is a typical midtown-style ride.")
+                    else:
+                        st.info("🌙 This looks like a longer cross-borough trip.")
 
-                with st.expander("View full request payload JSON"):
-                    st.json(payload)
-            except Exception as exc:
-                st.error(f"Prediction failed: {exc}")
+                    with st.expander("View full request payload JSON"):
+                        st.json(payload)
+                except Exception as exc:
+                    st.error(f"Prediction failed: {exc}")
 
     with right_column:
         st.markdown("### Project highlights")
