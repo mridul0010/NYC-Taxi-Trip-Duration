@@ -33,7 +33,6 @@
 # .dockerignore
 requirements-dev.txt
 data/
-models/
 .git/
 .dvc/
 LICENSE

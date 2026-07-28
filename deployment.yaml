@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trip-duration
+  namespace: default
+  labels:
+    app: trip-duration
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: trip-duration
+  template:
+    metadata:
+      labels:
+        app: trip-duration
+    spec:
+      containers:
+      - name: trip-duration
+        image: trip-duration:v1
+        imagePullPolicy: Never 
+        ports:
+        - containerPort: 8501
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-s3-credentials
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-s3-credentials
+              key: AWS_SECRET_ACCESS_KEY
+        - name: AWS_DEFAULT_REGION
+          valueFrom:
+            secretKeyRef:
+              name: aws-s3-credentials
+              key: AWS_DEFAULT_REGION
+        - name: AWS_S3_BUCKET
+          valueFrom:
+            secretKeyRef:
+              name: aws-s3-credentials
+              key: AWS_S3_BUCKET
+        livenessProbe:
+          httpGet:
+            path: /_stcore/health
+            port: 8501
+          initialDelaySeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /_stcore/health
+            port: 8501
+          initialDelaySeconds: 5
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: trip-duration-service
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: trip-duration
+  ports:
+    - port: 8501      # The port used inside the cluster
+      targetPort: 8501 # The containerPort from your deployment.yaml
+      nodePort: 32501  # The dedicated port to access the app on your localhost
