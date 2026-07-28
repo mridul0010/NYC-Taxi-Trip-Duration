@@ -21,6 +21,7 @@ A comprehensive MLOps project to predict the total trip duration of taxi rides i
 * **Streamlit Web Application**: An interactive interface to input pickup/dropoff coordinates and receive instant trip duration predictions.
 * **Geospatial & Route Intel**: Incorporates real-time map routing data (distances, steps, duration) via OSRM to drastically improve prediction accuracy.
 * **Containerized Deployment**: Ready to be launched using Docker and Docker Compose for a seamless setup experience.
+* **Cloud Deployment**: The application is deployed and hosted on an AWS EC2 instance for scalable and reliable access.
 * **Pre-configured Environment**: Easy setup with `Makefile` commands to manage dependencies and environments.
 
 ## Project Organization 📂
