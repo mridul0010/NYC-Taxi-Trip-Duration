@@ -20,23 +20,23 @@ An end-to-end **MLOps** project that predicts the total trip duration of taxi ri
 
 ```text
  ┌───────────┐  git push   ┌──────────────────┐   docker push   ┌───────────┐
- │  Developer├────────────►│  GitHub Actions   ├────────────────►│  AWS ECR  │
- └───────────┘             │  CI/CD Pipeline   │                 └─────┬─────┘
+ │  Developer├────────────►│  GitHub Actions  ├────────────────►│  AWS ECR  │
+ └───────────┘             │  CI/CD Pipeline  │                 └─────┬─────┘
                            └──────────────────┘                       │
                                     │                           docker pull
                                     │ self-hosted runner              │
                                     ▼                                 ▼
                            ┌──────────────────┐              ┌──────────────┐
-                           │   AWS EC2         │◄─────────────│  Docker      │
-                           │   (Production)    │  run container│  Container   │
+                           │   AWS EC2        │◄─────────────│  Docker      │
+                           │   (Production)   │ run container│  Container   │
                            └────────┬─────────┘              └──────────────┘
                                     │
                               fetch artifacts
                                     │
                                     ▼
                            ┌──────────────────┐
-                           │   AWS S3 Bucket   │
-                           │   (Model Store)   │
+                           │   AWS S3 Bucket  │
+                           │   (Model Store)  │
                            └──────────────────┘
 ```
 
@@ -92,17 +92,17 @@ Metrics sourced from [`reports/evaluation_metrics.json`](reports/evaluation_metr
 
 ### Streamlit Web Application
 
-<!-- Replace the path below with your actual screenshot -->
-<!-- ![Streamlit App](screenshots/streamlit_app.png) -->
+![Streamlit App](screenshots/1-nyc-ui.png) 
+![Streamlit App](screenshots/2-nyc-pred.png) 
+![Streamlit App](screenshots/3-nyc-guardrail.png) 
 
-*Add your Streamlit app screenshot here → save it as `screenshots/streamlit_app.png`*
 
 ### FastAPI Swagger Docs
 
 <!-- Replace the path below with your actual screenshot -->
-<!-- ![FastAPI Docs](screenshots/fastapi_docs.png) -->
-
-*Add your FastAPI `/docs` screenshot here → save it as `screenshots/fastapi_docs.png`*
+![FastAPI Docs](screenshots/4-fastAPI-ui.png)
+![FastAPI Docs](screenshots/5-fastapi-pred.png)
+![FastAPI Docs](screenshots/6-fastapi-result.png)
 
 ---
 
@@ -154,8 +154,8 @@ The ML pipeline is defined in `dvc.yaml` and managed via `params.yaml`. Below is
 │   └── modeling/
 │       ├── train.py            ← Model training (LightGBM / XGBoost)
 │       └── predict.py          ← Model evaluation & metric generation
-├── app/
-│   ├── api.py                  ← FastAPI REST API server
+├── api/
+│   ├── service.py                  ← FastAPI REST API server
 │   └── schemas.py              ← Pydantic request/response models
 ├── app.py                      ← Streamlit web application
 ├── fetch_artifacts.py          ← S3 model artifact downloader (used in Docker)
@@ -265,10 +265,10 @@ Access the app at **http://localhost:8501** (or port `8000` depending on your co
 
 ### 6. Run the FastAPI Server
 
-The project also includes a **FastAPI** REST API (`app/api.py`) for programmatic predictions.
+The project also includes a **FastAPI** REST API (`api/service.py`) for programmatic predictions.
 
 ```bash
-uvicorn app.api:app --reload --host 0.0.0.0 --port 8000
+uvicorn api.service:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Once running, open the interactive API docs at:

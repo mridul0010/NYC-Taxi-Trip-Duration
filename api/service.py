@@ -89,6 +89,13 @@ def is_valid_tlc_location(lat: float, lon: float) -> bool:
     return nyc_tlc_zone.contains(point)
 # ---------------------------------------
 
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to the NYC Taxi Trip Duration Prediction API! Use /predict endpoint to get predictions."
+    }
+
+
 @app.post("/predict")
 async def predict_duration(payload: TaxiPredictionRequest):
     
