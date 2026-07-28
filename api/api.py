@@ -21,7 +21,7 @@ from src.dataset_osrm import (
     osrm_unit_conversion,
     drop_features
 )
-from app.schemas import TaxiPredictionRequest
+from api.schemas import TaxiPredictionRequest
 
 ml_models = {}
 
