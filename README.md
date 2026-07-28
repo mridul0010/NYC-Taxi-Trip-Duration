@@ -220,10 +220,10 @@ Create a `.env` file in the project root (see `.env.example` below):
 
 ```env
 # DagsHub / MLflow
-DAGSHUB_REPO_OWNER=mridul0010
-DAGSHUB_REPO_NAME=NYC-Taxi-Trip-Duration
-MLFLOW_TRACKING_URI=https://dagshub.com/mridul0010/NYC-Taxi-Trip-Duration.mlflow
-MLFLOW_EXPERIMENT_NAME=7. DVC Pipeline
+DAGSHUB_REPO_OWNER=<your-dagshub-username>
+DAGSHUB_REPO_NAME=<your-dagshub-repo-name>
+MLFLOW_TRACKING_URI=<your-mlflow-tracking-uri>
+MLFLOW_EXPERIMENT_NAME=<your-experiment-name>
 
 # OSRM Routing
 OSRM_BASE_URL=http://router.project-osrm.org
