@@ -74,13 +74,35 @@ An end-to-end **MLOps** project that predicts the total trip duration of taxi ri
 
 ## Model Performance 📊
 
-| Metric             | Score    |
-| ------------------- | -------- |
-| **Test MAE**        | 2.89 min |
-| **Test RMSE**       | 4.80 min |
-| **Test R²**         | 0.806    |
-| **CV MAE**          | 2.90 min |
-| **Prediction Bias** | −0.54 min|
+Metrics sourced from [`reports/evaluation_metrics.json`](reports/evaluation_metrics.json):
+
+| Metric                | Train        | Test         |
+| --------------------- | ------------ | ------------ |
+| **MAE**               | 2.76 min     | 2.89 min     |
+| **RMSE**              | —            | 4.80 min     |
+| **R²**                | 0.824        | 0.806        |
+| **Cross-Val MAE**     | —            | 2.90 min     |
+| **Prediction Bias**   | —            | −0.54 min    |
+
+> **Interpretation**: The model generalises well — the gap between train and test MAE is only **0.13 min**, and a near-zero prediction bias confirms minimal systematic over/under-estimation.
+
+---
+
+## Screenshots 📸
+
+### Streamlit Web Application
+
+<!-- Replace the path below with your actual screenshot -->
+<!-- ![Streamlit App](screenshots/streamlit_app.png) -->
+
+*Add your Streamlit app screenshot here → save it as `screenshots/streamlit_app.png`*
+
+### FastAPI Swagger Docs
+
+<!-- Replace the path below with your actual screenshot -->
+<!-- ![FastAPI Docs](screenshots/fastapi_docs.png) -->
+
+*Add your FastAPI `/docs` screenshot here → save it as `screenshots/fastapi_docs.png`*
 
 ---
 
@@ -132,6 +154,9 @@ The ML pipeline is defined in `dvc.yaml` and managed via `params.yaml`. Below is
 │   └── modeling/
 │       ├── train.py            ← Model training (LightGBM / XGBoost)
 │       └── predict.py          ← Model evaluation & metric generation
+├── app/
+│   ├── api.py                  ← FastAPI REST API server
+│   └── schemas.py              ← Pydantic request/response models
 ├── app.py                      ← Streamlit web application
 ├── fetch_artifacts.py          ← S3 model artifact downloader (used in Docker)
 ├── deployment.yaml             ← Kubernetes Deployment + Service manifests
@@ -220,7 +245,7 @@ This executes all six stages defined in `dvc.yaml`. DVC intelligently skips stag
 
 > **Note**: Ensure raw data is available in `data/raw/` or pull from remote storage via `dvc pull`.
 
-### 5. Run the Web Application
+### 5. Run the Web Application (Streamlit)
 
 **Option A — Local Streamlit**
 
@@ -237,6 +262,44 @@ docker compose up --build
 ```
 
 Access the app at **http://localhost:8501** (or port `8000` depending on your compose config).
+
+### 6. Run the FastAPI Server
+
+The project also includes a **FastAPI** REST API (`app/api.py`) for programmatic predictions.
+
+```bash
+uvicorn app.api:app --reload --host 0.0.0.0 --port 8000
+```
+
+Once running, open the interactive API docs at:
+
+- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+**Example — `POST /predict`**
+
+```bash
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "vendor_id": 2,
+    "pickup_datetime": "2016-06-12 10:30:00",
+    "dropoff_datetime": "2016-06-12 11:00:00",
+    "passenger_count": 1,
+    "pickup_longitude": -73.9855,
+    "pickup_latitude": 40.7580,
+    "dropoff_longitude": -73.9654,
+    "dropoff_latitude": 40.7829,
+    "store_and_fwd_flag": "N"
+  }'
+```
+
+**Available Endpoints:**
+
+| Method | Endpoint    | Description                                  |
+| ------ | ----------- | -------------------------------------------- |
+| POST   | `/predict`  | Returns predicted trip duration in minutes   |
+| GET    | `/health`   | Health check with loaded component status    |
 
 ---
 
