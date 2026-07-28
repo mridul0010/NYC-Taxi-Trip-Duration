@@ -1,135 +1,298 @@
-# NYC Taxi Trip Duration Studio 🚕
+# 🚕 NYC Taxi Trip Duration Studio
 
-<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
-    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
-</a>
-<a href="https://www.python.org/">
-    <img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+">
-</a>
-<a href="https://streamlit.io/">
-    <img src="https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white" alt="Streamlit">
-</a>
-<a href="https://dvc.org/">
-    <img src="https://img.shields.io/badge/DVC-13E4C6?logo=dvc&logoColor=white" alt="DVC">
-</a>
+<p align="center">
+  <a href="https://cookiecutter-data-science.drivendata.org/"><img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" alt="CCDS" /></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white" alt="Python" /></a>
+  <a href="https://streamlit.io/"><img src="https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white" alt="Streamlit" /></a>
+  <a href="https://dvc.org/"><img src="https://img.shields.io/badge/DVC-13ADC7?logo=dvc&logoColor=white" alt="DVC" /></a>
+  <a href="https://mlflow.org/"><img src="https://img.shields.io/badge/MLflow-0194E2?logo=mlflow&logoColor=white" alt="MLflow" /></a>
+  <a href="https://aws.amazon.com/"><img src="https://img.shields.io/badge/AWS-EC2%20%7C%20ECR%20%7C%20S3-FF9900?logo=amazonaws&logoColor=white" alt="AWS" /></a>
+  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white" alt="Docker" /></a>
+  <a href="https://github.com/features/actions"><img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white" alt="GitHub Actions" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License" /></a>
+</p>
 
-A comprehensive MLOps project to predict the total trip duration of taxi rides in New York City. This repository features a full end-to-end Machine Learning pipeline utilizing Data Version Control (DVC) for reproducible data processing and model training, and a Streamlit web application to provide real-time route-aware predictions.
+An end-to-end **MLOps** project that predicts the total trip duration of taxi rides in New York City. It features a reproducible ML pipeline orchestrated by **DVC**, experiment tracking with **MLflow on DagsHub**, a **Streamlit** web application for real-time route-aware predictions, and a fully automated **CI/CD pipeline** that builds, pushes to **AWS ECR**, and deploys to an **AWS EC2** instance via a self-hosted GitHub Actions runner.
+
+---
+
+## Architecture Overview 🏗️
+
+```text
+ ┌───────────┐  git push   ┌──────────────────┐   docker push   ┌───────────┐
+ │  Developer├────────────►│  GitHub Actions   ├────────────────►│  AWS ECR  │
+ └───────────┘             │  CI/CD Pipeline   │                 └─────┬─────┘
+                           └──────────────────┘                       │
+                                    │                           docker pull
+                                    │ self-hosted runner              │
+                                    ▼                                 ▼
+                           ┌──────────────────┐              ┌──────────────┐
+                           │   AWS EC2         │◄─────────────│  Docker      │
+                           │   (Production)    │  run container│  Container   │
+                           └────────┬─────────┘              └──────────────┘
+                                    │
+                              fetch artifacts
+                                    │
+                                    ▼
+                           ┌──────────────────┐
+                           │   AWS S3 Bucket   │
+                           │   (Model Store)   │
+                           └──────────────────┘
+```
+
+---
+
+## Tech Stack 🛠️
+
+| Category               | Technology                                                           |
+| ----------------------- | -------------------------------------------------------------------- |
+| **Language**            | Python 3.10+                                                         |
+| **ML Models**           | LightGBM, XGBoost                                                   |
+| **Preprocessing**       | scikit-learn, pandas, reverse-geocoder                               |
+| **Route Intelligence**  | OSRM (Open Source Routing Machine)                                   |
+| **Pipeline**            | DVC (Data Version Control)                                           |
+| **Experiment Tracking** | MLflow (hosted on DagsHub)                                           |
+| **Web App**             | Streamlit                                                            |
+| **Containerization**    | Docker, Docker Compose                                               |
+| **CI/CD**               | GitHub Actions (self-hosted runner on EC2)                           |
+| **Cloud**               | AWS EC2 (deployment), ECR (image registry), S3 (model artifact store)|
+| **Linting**             | Ruff                                                                 |
+
+---
 
 ## Features ✨
 
-* **End-to-end Data Pipeline**: Managed via DVC (`dvc.yaml`) for processing raw data, generating OSRM features, training models (LightGBM/XGBoost), and evaluating performance.
-* **Streamlit Web Application**: An interactive interface to input pickup/dropoff coordinates and receive instant trip duration predictions.
-* **Geospatial & Route Intel**: Incorporates real-time map routing data (distances, steps, duration) via OSRM to drastically improve prediction accuracy.
-* **Containerized Deployment**: Ready to be launched using Docker and Docker Compose for a seamless setup experience.
-* **Cloud Deployment**: The application is deployed and hosted on an AWS EC2 instance for scalable and reliable access.
-* **Pre-configured Environment**: Easy setup with `Makefile` commands to manage dependencies and environments.
+- **Reproducible ML Pipeline** — Six-stage DVC pipeline covering data processing, OSRM-enriched feature engineering, model training, and evaluation.
+- **Experiment Tracking** — All training runs, hyperparameters, and metrics are logged to MLflow on DagsHub.
+- **Streamlit Web App** — Interactive UI with zone-based coordinate lookup, geographic guardrails, and live OSRM routing.
+- **OSRM Route Intel** — Real-time driving distance, travel time, and step count for every prediction.
+- **Automated CI/CD** — Every push to `master` triggers lint → build → push to ECR → deploy to EC2.
+- **Cloud Deployment** — Production application runs on an AWS EC2 instance with model artifacts pulled from S3 at startup.
+- **Kubernetes-Ready** — Includes `deployment.yaml` with health probes, resource limits, and Kubernetes secret management.
+
+---
+
+## Model Performance 📊
+
+| Metric             | Score    |
+| ------------------- | -------- |
+| **Test MAE**        | 2.89 min |
+| **Test RMSE**       | 4.80 min |
+| **Test R²**         | 0.806    |
+| **CV MAE**          | 2.90 min |
+| **Prediction Bias** | −0.54 min|
+
+---
+
+## DVC Pipeline 🔄
+
+The ML pipeline is defined in `dvc.yaml` and managed via `params.yaml`. Below is the execution flow:
+
+```text
+  data/raw/NYC.csv
+        │
+        ├──► dataset_baseline ──► features_baseline
+        │
+        └──► dataset_osrm ──► features_osrm ──► Model_Training ──► Model_Evaluating
+              (+ OSRM data)                      (LightGBM/XGB)    (metrics + predictions)
+```
+
+| Stage               | Script                        | Key Outputs                                  |
+| -------------------- | ----------------------------- | -------------------------------------------- |
+| `dataset_baseline`   | `src/dataset_baseline.py`     | `data/processed/baseline/processed_NYC.csv`  |
+| `features_baseline`  | `src/features_baseline.py`    | Train/test feature & label splits            |
+| `dataset_osrm`       | `src/dataset_osrm.py`        | `data/processed/osrm_boosted/processed_osrm_NYC.csv` |
+| `features_osrm`      | `src/features_osrm.py`       | Train/test feature & label splits (OSRM)     |
+| `Model_Training`     | `src/modeling/train.py`       | `models/model.joblib`                        |
+| `Model_Evaluating`   | `src/modeling/predict.py`     | `reports/evaluation_metrics.json`            |
+
+---
 
 ## Project Organization 📂
 
 ```text
-├── LICENSE            <- Open-source license if one is chosen
-├── Makefile           <- Makefile with convenience commands like `make data` or `make create_environment`
-├── README.md          <- The top-level README for developers using this project.
-├── data/              <- Data directory managed by DVC (raw, processed, external)
-├── docs/              <- A default mkdocs project; see www.mkdocs.org for details
-├── models/            <- Trained and serialized models (.joblib files)
-├── notebooks/         <- Jupyter notebooks for data exploration and prototyping.
-├── src/               <- Source code for use in this project (ML pipeline, feature engineering, config).
-├── app.py             <- Streamlit Web Application entry point.
-├── dvc.yaml           <- DVC Pipeline definition file.
-├── params.yaml        <- Parameters for model training and feature engineering.
-├── Dockerfile         <- Docker image configuration.
-├── compose.yaml       <- Docker Compose configuration to easily run the app.
-├── requirements.txt   <- The requirements file for reproducing the analysis environment.
-└── pyproject.toml     <- Project configuration file with package metadata.
+├── .github/workflows/
+│   └── ci-cd.yaml              ← GitHub Actions CI/CD pipeline
+├── data/
+│   ├── raw/                    ← Original immutable data (NYC.csv)
+│   ├── external/               ← OSRM route data (osrm_data.csv)
+│   └── processed/              ← Pipeline-generated train/test splits
+├── models/                     ← Trained model & preprocessor (.joblib)
+├── notebooks/                  ← Jupyter notebooks for exploration
+├── reports/
+│   ├── evaluation_metrics.json ← Model evaluation output
+│   └── figures/                ← Generated charts and plots
+├── src/
+│   ├── config.py               ← Centralized paths, feature lists, constants
+│   ├── dataset_baseline.py     ← Baseline data preprocessing
+│   ├── dataset_osrm.py         ← OSRM-enriched data preprocessing
+│   ├── feature_definitions.py  ← Shared feature column definitions
+│   ├── features_baseline.py    ← Baseline feature engineering + split
+│   ├── features_osrm.py        ← OSRM feature engineering + split
+│   └── modeling/
+│       ├── train.py            ← Model training (LightGBM / XGBoost)
+│       └── predict.py          ← Model evaluation & metric generation
+├── app.py                      ← Streamlit web application
+├── fetch_artifacts.py          ← S3 model artifact downloader (used in Docker)
+├── deployment.yaml             ← Kubernetes Deployment + Service manifests
+├── Dockerfile                  ← Multi-stage Docker image
+├── compose.yaml                ← Docker Compose for local development
+├── dvc.yaml                    ← DVC pipeline definition
+├── params.yaml                 ← Hyperparameters & pipeline config
+├── requirements.txt            ← Python dependencies
+├── pyproject.toml              ← Project metadata & Ruff config
+├── Makefile                    ← Convenience commands (env, deps, lint)
+└── LICENSE                     ← MIT License
 ```
+
+---
 
 ## Getting Started 🚀
 
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+### Prerequisites
 
-### 1. Prerequisites
+| Tool                  | Required | Purpose                            |
+| --------------------- | -------- | ---------------------------------- |
+| **Python 3.10+**      | ✅       | Runtime                            |
+| **Git**               | ✅       | Version control                    |
+| **DVC**               | ✅       | Data & pipeline versioning         |
+| **Docker**            | Optional | Containerized deployment           |
+| **Make**              | Optional | Shortcut commands                  |
+| **AWS CLI**           | Optional | S3 data sync                       |
 
-You will need the following installed on your machine:
-- **Python 3.10+** (Python 3.13 is the default in Makefile)
-- **Git** & **DVC**
-- **Docker & Docker Compose** (Optional, but recommended for running the web app easily)
-- **Make** (For utilizing the provided Makefile)
-
-### 2. Clone the repository
+### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/mridul0010/NYC-Taxi-Trip-Duration.git
 cd NYC-Taxi-Trip-Duration
 ```
 
-### 3. Setup Python Environment
+### 2. Create & Activate Environment
 
-You can use the provided `Makefile` to quickly create a conda environment and install dependencies:
+**Option A — Conda (recommended)**
 
 ```bash
-# Create a conda environment named NYC-Taxi-Trip-Duration
 make create_environment
-
-# Activate the environment
 conda activate NYC-Taxi-Trip-Duration
-
-# Install dependencies
 make requirements
 ```
 
-Alternatively, you can manually create a virtual environment:
+**Option B — venv**
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
+# Linux / macOS
+source venv/bin/activate
+# Windows
+venv\Scripts\activate
+
 pip install -r requirements.txt
 ```
 
-### 4. Running the Machine Learning Pipeline (DVC)
+### 3. Configure Environment Variables
 
-This project uses DVC to manage the data processing and training pipeline. The pipeline steps are defined in `dvc.yaml`.
+Create a `.env` file in the project root (see `.env.example` below):
 
-To reproduce the entire pipeline (data processing, feature engineering, model training, and evaluation), run:
+```env
+# DagsHub / MLflow
+DAGSHUB_REPO_OWNER=mridul0010
+DAGSHUB_REPO_NAME=NYC-Taxi-Trip-Duration
+MLFLOW_TRACKING_URI=https://dagshub.com/mridul0010/NYC-Taxi-Trip-Duration.mlflow
+MLFLOW_EXPERIMENT_NAME=7. DVC Pipeline
+
+# OSRM Routing
+OSRM_BASE_URL=http://router.project-osrm.org
+
+# AWS (needed only for S3 sync / production)
+AWS_ACCESS_KEY_ID=<your-key>
+AWS_SECRET_ACCESS_KEY=<your-secret>
+AWS_DEFAULT_REGION=us-east-1
+AWS_S3_BUCKET=nyc-taxi-trip-duration-project
+```
+
+### 4. Reproduce the ML Pipeline
 
 ```bash
 dvc repro
 ```
-This will automatically track changes and re-run only the necessary stages that were modified. Models will be saved in the `models/` directory and evaluation metrics will be outputted to `reports/evaluation_metrics.json`.
 
-*Note: Ensure you have the raw data available in `data/raw/` or configured remote storage via `make sync_data_down`.*
+This executes all six stages defined in `dvc.yaml`. DVC intelligently skips stages whose dependencies haven't changed.
 
-### 5. Running the Web Application (Streamlit)
+> **Note**: Ensure raw data is available in `data/raw/` or pull from remote storage via `dvc pull`.
 
-You can run the web application either locally or via Docker.
+### 5. Run the Web Application
 
-#### Option A: Running Locally via Streamlit
-
-With your virtual environment activated, run:
+**Option A — Local Streamlit**
 
 ```bash
 streamlit run app.py
 ```
-The app should automatically open in your default browser at `http://localhost:8501`.
 
-#### Option B: Running via Docker Compose (Recommended)
+The app will open at **http://localhost:8501**.
 
-If you have Docker installed, you can easily spin up the application in an isolated container. From the root of the project, run:
+**Option B — Docker Compose**
 
 ```bash
 docker compose up --build
 ```
-This will build the Docker image and start the Streamlit service. Access the application in your browser (usually available at `http://localhost:8501` or `http://localhost:8000`).
 
-## Development 🛠️
+Access the app at **http://localhost:8501** (or port `8000` depending on your compose config).
 
-- **Linting & Formatting**: Ensure your code follows the standard style guidelines by running:
-  ```bash
-  make lint
-  make format
-  ```
-- **Modifying the Model**: Adjust model hyperparameters inside `params.yaml` and re-run `dvc repro` to retrain the model and log new metrics.
+---
+
+## Deployment on AWS EC2 ☁️
+
+The application is deployed on an **AWS EC2** instance using a fully automated CI/CD pipeline powered by **GitHub Actions**.
+
+### Deployment Flow
+
+1. **Push to `master`** → GitHub Actions triggers the CI pipeline.
+2. **Continuous Integration** → Lints code and runs unit tests.
+3. **Build & Push** → Builds the Docker image and pushes it to **AWS ECR** (Elastic Container Registry).
+4. **Continuous Deployment** → A **self-hosted runner** on the EC2 instance pulls the latest image from ECR and runs it as a Docker container.
+5. **Artifact Fetch** → On container startup, `fetch_artifacts.py` downloads the latest model and preprocessor from **AWS S3**.
+
+### Required GitHub Secrets
+
+| Secret                     | Description                          |
+| -------------------------- | ------------------------------------ |
+| `AWS_ACCESS_KEY_ID`        | IAM access key                       |
+| `AWS_SECRET_ACCESS_KEY`    | IAM secret key                       |
+| `AWS_REGION`               | AWS region (e.g., `us-east-1`)       |
+| `ECR_REPOSITORY_NAME`      | ECR repository name                  |
+| `AWS_BUCKET_NAME`          | S3 bucket for model artifacts        |
+| `AWS_MODEL_KEY`            | S3 key for `model.joblib`            |
+| `AWS_PREPROCESSOR_KEY`     | S3 key for `preprocessor_osrm.joblib`|
+
+---
+
+## Development 🧑‍💻
+
+```bash
+# Lint (check only)
+make lint
+
+# Auto-format
+make format
+
+# Sync data from S3
+make sync_data_down
+```
+
+To retrain the model with new hyperparameters, edit `params.yaml` and run:
+
+```bash
+dvc repro
+```
+
+---
+
+## Author
+
+**Mridul Lata**
+
+---
 
 ## License 📜
 
-This project is licensed under the terms provided in the `LICENSE` file.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
