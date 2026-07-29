@@ -182,3 +182,14 @@ stages:
       hash: md5
       md5: 2b4a10ead4cd4c0a078212e8701eebb4
       size: 292
+  register_model:
+    cmd: python src/modeling/register_model.py
+    deps:
+    - path: run_information.json
+      hash: md5
+      md5: 2b4a10ead4cd4c0a078212e8701eebb4
+      size: 292
+    - path: src/modeling/register_model.py
+      hash: md5
+      md5: d9243222005be80368824a65b4ec33e0
+      size: 10893

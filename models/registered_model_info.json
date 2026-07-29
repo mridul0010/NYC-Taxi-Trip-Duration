@@ -1,0 +1,22 @@
+{
+    "registered_model_name": "NYC_Taxi_Trip_Duration_Regressor",
+    "logged_model_id": "m-9da7b1e165054acd8cece70de529baf0",
+    "model_version": "1",
+    "assigned_alias": "challenger",
+    "promoted_stage": "Staging",
+    "extracted_metrics": {
+        "train_mae": 2.760737666073662,
+        "CV 0": 2.907028294706804,
+        "prediction_bias": -0.535007651463262,
+        "mean_cv_score": 2.9010954591894547,
+        "test_mae": 2.8929779934686373,
+        "CV 3": 2.8994103774553177,
+        "CV 1": 2.897520509965442,
+        "CV 4": 2.905524393436746,
+        "CV 2": 2.8959937203829633,
+        "train_r2": 0.82430466462115,
+        "test_r2": 0.8063265370206647,
+        "test_rmse": 4.796496225137279
+    },
+    "timestamp": 1785332310.7783844
+}
