@@ -1,6 +1,6 @@
 # 🚕 NYC Taxi Trip Duration Studio
 
-[Live Project Link](https://nyc-taxi-trip-duration-studio.streamlit.app/)
+[Live Demo](https://nyc-taxi-trip-duration-studio.streamlit.app/)
 
 <p align="center">
   <a href="https://cookiecutter-data-science.drivendata.org/"><img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" alt="CCDS" /></a>
