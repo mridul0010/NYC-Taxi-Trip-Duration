@@ -1,7 +1,5 @@
 # 🚕 NYC Taxi Trip Duration Studio
 
-[Live Demo](https://nyc-taxi-trip-duration-studio.streamlit.app/)
-
 <p align="center">
   <a href="https://cookiecutter-data-science.drivendata.org/"><img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" alt="CCDS" /></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white" alt="Python" /></a>
@@ -13,6 +11,11 @@
   <a href="https://github.com/features/actions"><img src="https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white" alt="GitHub Actions" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License" /></a>
 </p>
+
+<p align="center">
+  <a href="https://nyc-taxi-trip-duration-studio.streamlit.app/">Live Demo</a> · <a href="https://github.com/mridul0010/NYC-Taxi-Trip-Duration/issues">Report Bug</a> · <a href="https://github.com/mridul0010/NYC-Taxi-Trip-Duration/issues">Request Feature</a>
+</p>
+
 
 An end-to-end **MLOps** project that predicts the total trip duration of taxi rides in New York City. It features a reproducible ML pipeline orchestrated by **DVC**, experiment tracking with **MLflow on DagsHub**, a **Streamlit** web application for real-time route-aware predictions, and a fully automated **CI/CD pipeline** that builds, pushes to **AWS ECR**, and deploys to an **AWS EC2** instance via a self-hosted GitHub Actions runner.
 
